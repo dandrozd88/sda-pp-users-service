@@ -42,12 +42,13 @@ public class UsersDAO {
         }
     }
 
-    public void update(User updatedUser) {
+    public User update(User updatedUser) {
         Session session = HibernateUtils.openSession();
         Transaction transaction = session.beginTransaction();
-        session.merge(updatedUser);
+        User updateUser = session.merge(updatedUser);
         transaction.commit();
         session.close();
+        return updateUser;
     }
 
     public boolean existsByUsername(String username) {

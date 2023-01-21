@@ -21,21 +21,44 @@ public class UsersDAO {
         try (Session session = HibernateUtils.openSession()) {
             Transaction transaction = session.beginTransaction();
             User user = session.find(User.class, username);
-            boolean exist = user != null;
-            if (exist) {
+            boolean exists = user != null;
+            if (exists) {
                 session.remove(user);
             }
             transaction.commit();
-            return exist;
+            return exists;
         }
     }
 
     public List<User> findAll() {
-        Session session = HibernateUtils.openSession();
-        String query = "SELECT u FROM User u";
-        List<User> users = session.createQuery(query, User.class).list();
-        session.close();
-        return users;
+        try (Session session = HibernateUtils.openSession()) {
+            return session.createQuery("SELECT u FROM User u", User.class).list();
+        }
     }
 
+    public User findUserByUsername(String username) {
+        try (Session session = HibernateUtils.openSession()) {
+            return session.find(User.class, username);
+        }
+    }
+
+    public void update(User updatedUser) {
+        Session session = HibernateUtils.openSession();
+        Transaction transaction = session.beginTransaction();
+        session.merge(updatedUser);
+        transaction.commit();
+        session.close();
+    }
+
+    public boolean existsByUsername(String username) {
+        Session session = HibernateUtils.openSession();
+        String query = "SELECT count(u) FROM User u WHERE u.username = :username";
+
+        boolean exists = session.createQuery(query, Long.class)
+                .setParameter("username", username)
+                .uniqueResult() > 0;
+
+        session.close();
+        return exists;
+    }
 }

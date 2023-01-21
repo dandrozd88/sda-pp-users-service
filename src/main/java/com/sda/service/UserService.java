@@ -42,7 +42,6 @@ public class UserService {
         if (exists) {
             throw new UsernameConflictException("User with given username already exists!");
         }
-
         usersDAO.create(user);
     }
 
@@ -51,11 +50,9 @@ public class UserService {
         if (!user.getUsername().equals(username)) {
             throw new UsernameConflictException("Usernames conflict!");
         }
-
         if (!usersDAO.existsByUsername(username)) {
             throw new NotFoundException("User with username %s dose not exits!".formatted(username));
         }
-
         User updatedUser = usersDAO.update(user);
         return userMapper.map(updatedUser);
     }
